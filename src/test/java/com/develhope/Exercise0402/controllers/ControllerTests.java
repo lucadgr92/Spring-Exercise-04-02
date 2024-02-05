@@ -64,7 +64,7 @@ public class ControllerTests {
     void addUser() throws Exception {
         UserEntity user = createUser();
         String studentJSON = objectMapper.writeValueAsString(user);
-        MvcResult result = this.mockMvc.perform(post("/newuser")
+        MvcResult result = this.mockMvc.perform(post("/v1/newuser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(studentJSON))
                 .andDo(print())
@@ -78,30 +78,46 @@ public class ControllerTests {
     void showUsers() throws Exception {
         createAndSaveFourUsers();
 
-        MvcResult result = mockMvc.perform(get("/users"))
+        MvcResult result = mockMvc.perform(get("/v1/users"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         List<UserEntity> usersFromResponse = objectMapper.readValue(result.getResponse()
                 .getContentAsString(),List.class);
-        assertEquals(usersFromResponse,4);
+        assertEquals(usersFromResponse.size(),4);
         System.out.println("Users in DB are: " + usersFromResponse.size());
     }
 
-    @Test
+/*    @Test
     void showUser() throws Exception {
         userRepository.deleteAll();
         UserEntity user = createUser();
 
-        MvcResult result = this.mockMvc.perform(get("/user/" + user.getId()))
+        MvcResult result = this.mockMvc.perform(get("/v1/user/" + user.getId()))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
         UserEntity userFromResponse = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), UserEntity.class);
         assertEquals(userFromResponse.getId(),user.getId());
+    }*/
+
+    @Test
+    void showUser() throws Exception {
+        userRepository.deleteAll();
+        UserEntity user = userRepository.save(createUser());
+
+        MvcResult result = this.mockMvc.perform(get("/v1/showuser/" + user.getId()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserEntity userFromResponse = objectMapper.readValue(
+                result.getResponse().getContentAsString(), UserEntity.class);
+        assertEquals(userFromResponse.getId(), user.getId());
     }
+
 
     @Test
     void deleteUser() throws Exception {
@@ -110,7 +126,7 @@ public class ControllerTests {
 
         UserEntity savedUser = userRepository.save(user);
 
-        this.mockMvc.perform(delete("/user/"+savedUser.getId()))
+        this.mockMvc.perform(delete("/v1/deluser/"+savedUser.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -122,7 +138,7 @@ public class ControllerTests {
     @Test
     void deleteUsers() throws Exception {
         createAndSaveFourUsers();
-        this.mockMvc.perform(delete("/delusers/"))
+        this.mockMvc.perform(delete("/v1/delusers"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();

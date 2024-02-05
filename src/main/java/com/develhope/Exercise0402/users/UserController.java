@@ -33,7 +33,7 @@ public class UserController {
         return userService.showUsers();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/showuser/{id}")
     public @ResponseBody ResponseEntity<UserEntity> showUser(@PathVariable long id) {
         Optional<UserEntity> user = userService.showUser(id);
         if(user.isPresent()) {

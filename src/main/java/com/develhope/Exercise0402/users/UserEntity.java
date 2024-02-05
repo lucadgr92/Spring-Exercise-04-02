@@ -12,7 +12,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name="users")
+@Table(name="user-table")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UserEntity {
 
